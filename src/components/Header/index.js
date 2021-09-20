@@ -61,7 +61,7 @@ const Header = (props) => {
   return (
     <div className={classes.root}>
       <HideOnScroll {...props}>
-        <BrowserRouter>
+        <BrowserRouter basename="/prueba-crud">
           <AppBar>
             <Toolbar>
               <Typography
