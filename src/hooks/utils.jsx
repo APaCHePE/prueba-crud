@@ -29,12 +29,26 @@ export async function createOrders (Order){
     console.log(e)
   }
 }
+export async function updateOrder (Order){
+  try{
+    const response = await axios ({
+      url:`${baseUrl}/order/update`,
+      method: 'POST',
+      data: Order
+    })
+
+    return (response.status===200)?response.data.result:null;
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 export async function getProducts (){
   try{
     const response = await axios ({
       url:`${baseUrl}/product/find-all-product`,
-      method: 'GET'
+      method: 'POST',
+      data: { "listCategory": [1,2] }
     })
     // console.log("RESPONSE",response.data.result);
     return (response.status===200)?response.data.result:[];

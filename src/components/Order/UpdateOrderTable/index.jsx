@@ -5,6 +5,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { updateOrder } from "../../../hooks/utils";
 import { Paper, Button } from "@material-ui/core";
 
 
@@ -20,7 +21,7 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-export default function BasicTable({ productsRows, setRows }) {
+export default function BasicTable({ productsRows, setRows, setOpenEdit, setProductEdit ,setOpenDelete, setProductDelete }) {
 
   const [quantity, setQuantity] = useState(0)
   const [quantityCost, setQuantityCost] = useState()
@@ -33,22 +34,21 @@ export default function BasicTable({ productsRows, setRows }) {
     let a = parseInt(e.target.value)
     let b = parseFloat(e.target.id)
   }
-
-  const handleClickDelete = (id) => {
-    console.log("delete", id);
-    let arrayAux = [];
+  function multiplicar(a ,b ) {
+    return a*b
   }
-  const handleClickEdit = (id) => {
-    console.log("edit", id);
-    productsRows.forEach((item) => {
-        if(item.idProduct == id){
-          console.log("editar row");
-          item.mode=2;
-        }else {
-          item.mode=1;
-        }
-    })
-    setRows(productsRows);
+  const handleClickDelete = (row) => {
+    setOpenDelete(true)
+    setProductDelete(row)
+    console.log("delete", row);
+    // let orderDelete = new Object()
+    // orderDelete.
+    // updateOrder
+  }
+  const handleClickEdit = (row) => {
+    console.log("edit", row);
+    setProductEdit(row);
+    setOpenEdit(true)
   }
   const handleClickCancel = (id) => {
     console.log("cancel", id);
@@ -79,17 +79,13 @@ export default function BasicTable({ productsRows, setRows }) {
                 {row.idProduct}
               </TableCell>
               <TableCell align="right">{row.name}</TableCell>
-              <TableCell align="right"><input type="number" className="input-Quantity" min="1" step="1"
-                disabled={(row.mode == 1 ? true : false)}
-                onChange={handleChange} name={row.id} id={row.priceUnit} /></TableCell>
-              <TableCell align="right">${row.priceUnit.toFixed(1)}</TableCell>
-              <TableCell align="right" >${row.amount.toFixed(1)}</TableCell>
+              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell align="right">$ {row.priceUnit.toFixed(1)}</TableCell>
+              <TableCell align="right" >$ {multiplicar(row.amount,row.priceUnit).toFixed(1) }</TableCell>
               <TableCell align="center">
-                {(row.mode == 1) ? <><button className="btn btn-link" onClick={(e) => handleClickEdit(row.idProduct)} >Edit</button>
-                  <button className="btn btn-link" onClick={(e) => handleClickDelete(row.idProduct)} >Delete</button>
-                </> :
-                  <><button className="btn btn-link" onClick={(e) => handleClickCancel(row.idProduct)} >Save</button>
-                    <button className="btn btn-link" onClick={(e) => handleClickCancel(row.idProduct)} >Cancel</button></>}
+                {<><button className="btn btn-link" onClick={(e) => handleClickEdit(row)} >Edit</button>
+                  <button className="btn btn-link" onClick={(e) => handleClickDelete(row)} >Delete</button>
+                </>}
               </TableCell>
             </TableRow>
           ))}

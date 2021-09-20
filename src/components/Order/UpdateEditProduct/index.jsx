@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import { getProducts, getCategoryProducts, updateOrder } from "../../../hooks/utils";
 import "./AddProduct.scss"
 
-const AddProduct = ({setOpen, order}) => {
+const EditProduct = ({setOpenEdit, order, product}) => {
   const [listCategory, setlistCategory] = useState([]);
   const [listProducts, setProducts] = useState([]);
   const [listCategorySelecteds, setlistCategorySelected] = useState([]);
@@ -14,7 +14,9 @@ const AddProduct = ({setOpen, order}) => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(0);
   useEffect(() => {
-
+    setQuantity(product.amount)
+    setPrice(product.priceUnit)
+    setTotal(product.amount*product.priceUnit)
     getCategoryProducts().then(value => {
       setlistCategory(value);
     });
@@ -59,29 +61,31 @@ const AddProduct = ({setOpen, order}) => {
     let orderSave = new Object();
     orderSave.id = order.id;
     //add product
-    orderSave.action = 2 
-    itemProductSelecteds.amount = quantity;
-    orderSave.listProducts = [itemProductSelecteds]
+    orderSave.action = 1
+    product.amount= quantity
+    orderSave.listProducts = [product]
     console.log(orderSave);
     
     updateOrder(orderSave).then((value) => {
-      console.log("orden añadida con un producto mas ", value);
-      setOpen(false)
+      console.log("orden editado con un producto mas ", value);
+      setOpenEdit(false)
     });
   }
   const handleClickCancel = () => {
-    setOpen(false);
+    setOpenEdit(false);
   }
   return (
     <>
       <div className="content-product">
         <div>
-          <h1>Add Product</h1>
+          <h1>Edit Product</h1>
           <div className="select select-multiple my-3">
-            < SelectMultiple title={"Select category"} list={listCategory} setlistCategorySelected={setlistCategorySelected} />
+            <label className="col-2">Categoy</label>
+            <input value={product.category.name} disabled/>
           </div>
           <div className="select select-unique mb-3">
-            < Select title={"Select product"} list={listProducts} setItemSelected={setItemSelected} />
+            <label className="col-2">Product</label>
+            <input value={product.name} disabled/>
           </div>
           <div className="row my-2">
             <label className="col-2">Price</label>
@@ -104,4 +108,4 @@ const AddProduct = ({setOpen, order}) => {
     </>
   )
 }
-export default AddProduct;
+export default EditProduct;

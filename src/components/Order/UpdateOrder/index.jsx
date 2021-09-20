@@ -2,18 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useMediaQuery, Button } from "@material-ui/core";
 import { Input } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
-import { getProducts } from "../../../hooks/utils";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { getProducts, updateOrder } from "../../../hooks/utils";
 import Stylos from "./Update.scss";
 import UpdateOrderTable from "../UpdateOrderTable";
 import AddProduct from "../UpdateAddProduct";
 import moment from 'moment';
+import EditProduct from "../UpdateEditProduct";
 
 function UpdateOrder({ setpageNumber, order }) {
 
   const [dateInput, setDateInput] = useState(moment(new Date(order.date), "YYYY/MM/DD").format("YYYY-MM-DD"));
   const [clientInput, setClientInput] = useState(order.client);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false)
   const [maxWidth, setMaxWidth] = useState('sm');
+  const [productEdit, setProductEdit] = useState({})
+  const [productDelete, setProductDelete] = useState({})
 
   const [rows, setRows] = useState([]);
 
@@ -22,7 +29,7 @@ function UpdateOrder({ setpageNumber, order }) {
 
   useEffect(() => {
     order.listProducts.forEach(element => {
-      element.mode=1;
+      element.mode = 1;
     });
     setRows(order.listProducts);
   }, [])
@@ -36,14 +43,33 @@ function UpdateOrder({ setpageNumber, order }) {
   const handleClickBack = () => {
     setpageNumber(0);
   }
+  const handleDelete = () => {
+    let orderSave = new Object();
+    orderSave.id = order.id;
+    //add product
+    orderSave.action = 4
+    orderSave.listProducts = [{ productDelete }]
+    console.log("eliminar producto ", orderSave);
 
-  const handleClickComplete = () => {
-
+    updateOrder(orderSave).then((value) => {
+      console.log("orden añadida con un producto mas ", value);
+      setOpenDelete(false)
+    });
   }
 
-  const handleClickReject = () => {
+  const handleClickComplete = (action) => {
+    let orderSave = new Object();
+    orderSave.id = order.id;
+    //add product
+    orderSave.action = 3
+    orderSave.status = action
+    console.log(orderSave);
 
+    updateOrder(orderSave).then((value) => {
+      console.log("orden añadida con un producto mas ", value);
+    });
   }
+
   return (
     <>
 
@@ -70,9 +96,9 @@ function UpdateOrder({ setpageNumber, order }) {
                   value={clientInput}
                   placeholder="Writing customer..."
                   disabled
-                  onChange={ e => {
-                    setClientInput(e.target.value) 
-                    console.log(e.target.value) 
+                  onChange={e => {
+                    setClientInput(e.target.value)
+                    console.log(e.target.value)
                   }}
                 />
               </div>
@@ -106,7 +132,7 @@ function UpdateOrder({ setpageNumber, order }) {
                   value={dateInput}
                   disabled
                   placeholder="Select to date"
-                  onChange={(e)=>{
+                  onChange={(e) => {
                     setDateInput(e.target.value);
                     console.log(order);
                     console.log(moment(new Date(order.date), "YYYY/MM/DD").format("DD/MM/YYYY"));
@@ -118,13 +144,31 @@ function UpdateOrder({ setpageNumber, order }) {
         </div>
 
         <div className="containerTable">
-          <UpdateOrderTable productsRows={rows} setRows={setRows} />
+          <UpdateOrderTable productsRows={rows} setRows={setRows} setOpenEdit={setOpenEdit} setProductEdit={setProductEdit} setOpenDelete={setOpenDelete} setProductDelete={setProductDelete}/>
         </div>
 
         <Dialog fullWidth={true} maxWidth={maxWidth} open={open} onClose={handleClose}>
-          <AddProduct setOpen={setOpen}/>
+          <AddProduct setOpen={setOpen} order={order} />
         </Dialog>
-
+        <Dialog fullWidth={true} maxWidth={maxWidth} open={openEdit} onClose={handleClose}>
+          <EditProduct setOpenEdit={setOpenEdit} order={order} product={productEdit} />
+        </Dialog>
+        <Dialog
+          open={openDelete}
+          onClose={() => { setOpenDelete(false) }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"delete product?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={() => { setOpenDelete(false) }} >Cancel</Button>
+            <Button onClick={handleDelete} autoFocus>
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
         <div className="orderResults">
           <div className="right-button">
             <button
@@ -158,10 +202,10 @@ function UpdateOrder({ setpageNumber, order }) {
             </ul>
           </div>
           <div className="right-button">
-            <button type="button" className="px-2 btn btn-success " onClick={(e) => handleClickComplete()}>
+            <button type="button" className="px-2 btn btn-success " onClick={(e) => handleClickComplete(2)}>
               Complete order
             </button>
-            <button type="button" className="px-2 btn btn-danger btn-margin" onClick={(e) => handleClickReject()}>
+            <button type="button" className="px-2 btn btn-danger btn-margin" onClick={(e) => handleClickComplete(3)}>
               Reject order
             </button>
           </div>
