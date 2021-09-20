@@ -1,0 +1,10 @@
+.conteiner{
+  width: 100%;
+  // background-color: brown;
+  // color: red;
+  &-select-simple{
+    display: block;
+    min-width: 540px;
+    max-width: 540px;
+  }
+}

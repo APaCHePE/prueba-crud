@@ -1,0 +1,10 @@
+.conteiner{
+  width: 100%;
+  // background-color: brown;
+  &-select-multiple{
+    min-width: 540px;
+    max-width: 540px;
+    display: block;
+    // background-color: blueviolet;
+  }
+}
